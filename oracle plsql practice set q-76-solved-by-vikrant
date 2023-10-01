@@ -1,0 +1,1911 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+************************************Database Oracle(pl/sql) Project Practice set*****************************
+**************Solved By Vikrant Singh ,(GPM),Chitrakoot.2023/10/01****************************************************
+**Sign-
+== End of Question.
+-- Start of Answer.
+Note- All Questions are included in manipulated sequence.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+question-76. Describe any 2 applications (uses) of a trigger..
+-------------------------------------------------------------
+Triggers are database objects that are used to automatically execute a set of actions or code in response to specific events or conditions within a database management system (DBMS). They are commonly used to maintain data integrity, enforce business rules, and automate various tasks. Here are two common applications or uses of triggers:
+
+1. Enforcing Data Integrity:
+   Triggers are frequently employed to enforce data integrity constraints within a database. For example, a database may have a rule that specifies that the total quantity of items in stock should never be allowed to go negative. To enforce this rule, a trigger can be created that fires before an update or insert operation on the "inventory" table. If the trigger detects that the new data violates the constraint (e.g., the update would result in a negative quantity), it can raise an error or take corrective action to prevent the update from occurring. This ensures that the database always contains valid and consistent data.
+
+2. Auditing and Logging:
+   Triggers are also used for auditing and logging purposes. They can be set up to automatically record changes made to a database, providing an audit trail of all data modifications. For example, you can create triggers that capture information about who made a change, what was changed, and when the change occurred. This information can be invaluable for tracking user activity, troubleshooting issues, and complying with regulatory requirements. Triggers can insert records into an "audit log" table whenever data is inserted, updated, or deleted in the main database tables. This allows administrators to review and analyze historical changes to the data.
+
+In summary, triggers in a database management system serve various purposes, including enforcing data integrity rules and constraints, automating data-related tasks, and maintaining an audit trail of database changes. These applications help ensure the accuracy, consistency, and security of the data stored in the database.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+question-75. Create an example of delete trigger to execute before delete operation on table.
+---------------------------------------------------------------------------------------------
+-- Create the orders table
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    order_date DATE
+);
+
+-- Create the order_log table for logging deleted records
+CREATE TABLE order_log (
+    log_id INT PRIMARY KEY,
+    deleted_order_id INT,
+    deleted_customer_name VARCHAR(50),
+    deleted_order_date DATE,
+    deletion_timestamp TIMESTAMP
+);
+
+-- Create the DELETE trigger
+DELIMITER //
+
+CREATE TRIGGER before_delete_order
+BEFORE DELETE ON orders
+FOR EACH ROW
+BEGIN
+    INSERT INTO order_log (deleted_order_id, deleted_customer_name, deleted_order_date, deletion_timestamp)
+    VALUES (OLD.order_id, OLD.customer_name, OLD.order_date, NOW());
+END;
+//
+
+DELIMITER ;
+-----------------------------------------------------------------------------------------------------------------------
+question-74. Create a trigger after insert in student table display warning message if sbranch length
+is less than 5 display message: full name of branch is recommended.
+--------------------------------------------------------------------
+-- Create the student table
+CREATE TABLE student (
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(50),
+    sbranch VARCHAR(10)
+);
+
+-- Create the AFTER INSERT trigger
+DELIMITER //
+
+CREATE TRIGGER after_insert_student
+AFTER INSERT ON student
+FOR EACH ROW
+BEGIN
+    IF LENGTH(NEW.sbranch) < 5 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Warning: The full name of the branch is recommended.';
+    END IF;
+END;
+//
+
+DELIMITER ;
+===============================================================================================
+question-73. Create a trigger on insert and update in student table display error and stop insert
+operation if student age is more then 35 years.
+------------------------------------------------
+-- Create the student table
+CREATE TABLE student (
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(50),
+    birthdate DATE,
+    age INT
+);
+
+-- Create the BEFORE INSERT and BEFORE UPDATE trigger
+DELIMITER //
+
+CREATE TRIGGER before_insert_update_student
+BEFORE INSERT ON student
+FOR EACH ROW
+BEGIN
+    DECLARE student_age INT;
+    SET student_age = TIMESTAMPDIFF(YEAR, NEW.birthdate, CURDATE());
+
+    IF student_age > 35 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Error: Student age cannot exceed 35 years.';
+    END IF;
+END;
+//
+
+DELIMITER ;
+=====================================================================================
+Question-71. What is a database trigger? What are the features of trigger.
+---------------------------------------------------------------------------
+A database trigger is a database object that is used to automatically execute a set of actions or code in response to specific events or conditions that occur within a database management system (DBMS). Triggers are associated with database tables and are designed to perform tasks such as enforcing data integrity rules, automating data-related actions, auditing changes to data, and more. They are an essential part of database systems, providing a way to ensure data consistency and automate tasks without manual intervention.
+
+Here are some key features of database triggers:
+
+1. Event-Based Execution: Triggers are triggered by specific events or actions that occur within the database, such as INSERT, UPDATE, DELETE, or other data manipulation operations. Triggers can also be time-based, firing at specific times or intervals.
+
+2. Table-Specific: Triggers are associated with a particular database table, and they are defined to respond to events related to that table. Each table can have multiple triggers, each responding to different events.
+
+3. Trigger Timing: Triggers can be defined to execute either before or after the triggering event. BEFORE triggers typically check conditions before the event and can modify data before it's written to the database. AFTER triggers execute after the event, allowing for auditing or additional actions.
+
+4. Row-Level or Statement-Level: Triggers can operate at either the row level or the statement level. Row-level triggers fire once for each affected row, while statement-level triggers fire once for each SQL statement.
+
+5. Conditional Logic: Triggers often include conditional logic, allowing you to specify under what conditions the trigger should take action. This can involve checking values in the affected rows or other criteria.
+
+6. Data Access: Triggers have access to both the old (before the event) and new (after the event) data values, allowing them to compare and manipulate data as needed.
+
+7. Error Handling: Triggers can be used to handle errors and enforce business rules. They can raise custom errors, roll back transactions, or take corrective actions to maintain data consistency.
+
+8. Audit Trails: Triggers are commonly used to create audit trails, recording changes made to data for security and compliance purposes.
+
+9. Cascading Actions: Triggers can initiate cascading actions, such as automatically updating related records or performing additional operations when a specific event occurs.
+
+10. Preventing Infinite Loops: DBMSs typically provide mechanisms to prevent infinite loops caused by triggers triggering other triggers. This includes limiting trigger recursion.
+
+Overall, triggers provide a powerful way to automate database-related tasks, ensure data integrity, and enforce business rules, reducing the need for manual intervention and enhancing the reliability of database systems. However, they should be used judiciously to avoid complexity and maintain performance.
+=======================================================================================================================================
+Question-70. Create a procedure to find area of square.
+---------------------------------------------------------
+DELIMITER ;
+
+-- Declare a variable to store the result
+DECLARE @square_area DECIMAL(10, 2);
+
+-- Call the procedure with the side length you want to calculate the area for
+CALL CalculateSquareArea(5, @square_area);
+
+-- @square_area now contains the calculated area of the square
+
+-- Display the result
+SELECT @square_area;
+======================================================================================
+Question-69. Create a procedure to print number of records in student table.
+-------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE PrintStudentCount IS
+    student_count NUMBER;
+BEGIN
+    -- Query to count the number of records in the "student" table
+    SELECT COUNT(*) INTO student_count FROM student;
+
+    -- Display the result
+    DBMS_OUTPUT.PUT_LINE('Number of records in the student table: ' || student_count);
+END;
+/
+To execute this procedure and see the number of records, you can call it like this:
+BEGIN
+    PrintStudentCount;
+END;
+/
+=============================================================================================
+Question-68. Create a procedure to find last digit of a number print output outside the procedure
+by using out parameter.
+-----------------------------
+CREATE OR REPLACE PROCEDURE FindLastDigit(
+    p_number IN NUMBER,
+    p_last_digit OUT NUMBER
+) AS
+BEGIN
+    -- Calculate the last digit
+    p_last_digit := ABS(p_number) % 10;
+END FindLastDigit;
+/
+To call this procedure and retrieve the last digit, you can do the following:
+DECLARE
+    v_input_number NUMBER := 12345; -- Replace with your desired number
+
+    v_result NUMBER; -- This variable will store the result
+
+BEGIN
+    FindLastDigit(v_input_number, v_result);
+    DBMS_OUTPUT.PUT_LINE('Last digit of ' || v_input_number || ' is ' || v_result);
+END;
+/
+==========================================================================================
+Question-67. Create a function to find smallest number from 3 numbers.
+-----------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION FindSmallestNumber(
+    p_num1 IN NUMBER,
+    p_num2 IN NUMBER,
+    p_num3 IN NUMBER
+) RETURN NUMBER
+IS
+    smallest NUMBER;
+BEGIN
+    -- Initialize the smallest number with the first number
+    smallest := p_num1;
+
+    -- Compare with the second number
+    IF p_num2 < smallest THEN
+        smallest := p_num2;
+    END IF;
+
+    -- Compare with the third number
+    IF p_num3 < smallest THEN
+        smallest := p_num3;
+    END IF;
+
+    -- Return the smallest number
+    RETURN smallest;
+END FindSmallestNumber;
+/
+ call this function to find the smallest number among three numbers like this:
+ DECLARE
+    num1 NUMBER := 10;
+    num2 NUMBER := 5;
+    num3 NUMBER := 8;
+    smallest_num NUMBER;
+
+BEGIN
+    smallest_num := FindSmallestNumber(num1, num2, num3);
+    DBMS_OUTPUT.PUT_LINE('The smallest number is: ' || smallest_num);
+END;
+/
+===================================================================================
+Question-66. Create a function to find number of words in a given string.
+--------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION CountWordsInString(
+    p_input_string IN VARCHAR2
+) RETURN NUMBER
+IS
+    word_count NUMBER := 0;
+BEGIN
+    -- Trim leading and trailing spaces from the input string
+    p_input_string := TRIM(BOTH ' ' FROM p_input_string);
+
+    -- If the string is empty, return 0
+    IF LENGTH(p_input_string) = 0 THEN
+        RETURN 0;
+    END IF;
+
+    -- Split the string into words using spaces as the delimiter
+    FOR i IN 1..LENGTH(p_input_string)
+    LOOP
+        IF SUBSTR(p_input_string, i, 1) = ' ' THEN
+            -- Increment the word count when a space is encountered
+            word_count := word_count + 1;
+            -- Skip consecutive spaces
+            WHILE i <= LENGTH(p_input_string) AND SUBSTR(p_input_string, i, 1) = ' '
+            LOOP
+                i := i + 1;
+            END LOOP;
+        END IF;
+    END LOOP;
+
+    -- Increment the word count for the last word (no space after it)
+    word_count := word_count + 1;
+
+    -- Return the total word count
+    RETURN word_count;
+END CountWordsInString;
+/
+call this function to count the words in a string like this:
+DECLARE
+    input_string VARCHAR2(100) := 'This is a test string';
+    word_count NUMBER;
+
+BEGIN
+    word_count := CountWordsInString(input_string);
+    DBMS_OUTPUT.PUT_LINE('Number of words: ' || word_count);
+END;
+/
+===========================================================================
+Question-65. Write a program in PL/SQL to show the uses of SQL%FOUND to determine if a
+DELETE statement affected any rows.
+--------------------------------------
+DECLARE
+    v_rows_affected NUMBER;
+BEGIN
+    -- Attempt to delete rows from a hypothetical "employees" table
+    DELETE FROM employees WHERE department = 'Inactive';
+
+    -- Check if any rows were affected by the DELETE statement
+    IF SQL%FOUND THEN
+        v_rows_affected := SQL%ROWCOUNT; -- Get the number of affected rows
+        DBMS_OUTPUT.PUT_LINE('DELETE statement affected ' || v_rows_affected || ' rows.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('DELETE statement did not affect any rows.');
+    END IF;
+END;
+/
+=========================================================================================================
+Question-60. Create a table student from SQL command line as given belowsid
+int PK
+sname varchar (60)
+sbranch varchar (70)
+sage int
+--------------
+CREATE TABLE student (
+    sid INT PRIMARY KEY,
+    sname VARCHAR(60),
+    sbranch VARCHAR(70),
+    sage INT
+);
+===============================
+question-61. Now insert any 7 records in student table from command line.
+--------------------------------------------------------------------------
+-- Insert records into the student table
+INSERT INTO student (sid, sname, sbranch, sage)
+VALUES (1, 'John Doe', 'Computer Science', 22);
+
+INSERT INTO student (sid, sname, sbranch, sage)
+VALUES (2, 'Alice Smith', 'Mathematics', 20);
+
+INSERT INTO student (sid, sname, sbranch, sage)
+VALUES (3, 'Bob Johnson', 'Engineering', 21);
+
+INSERT INTO student (sid, sname, sbranch, sage)
+VALUES (4, 'Emily Davis', 'Biology', 23);
+
+INSERT INTO student (sid, sname, sbranch, sage)
+VALUES (5, 'Michael Wilson', 'Physics', 24);
+
+INSERT INTO student (sid, sname, sbranch, sage)
+VALUES (6, 'Sophia Brown', 'Chemistry', 22);
+
+INSERT INTO student (sid, sname, sbranch, sage)
+VALUES (7, 'Liam Jones', 'English', 20);
+===========================================================
+Question-62. Create a cursor to display all records of student table.
+---------------------------------------------------------------------
+-- Declare a cursor to select all records from the student table
+DECLARE
+    CURSOR student_cursor IS
+        SELECT * FROM student;
+
+    -- Declare variables to store column values
+    v_sid student.sid%TYPE;
+    v_sname student.sname%TYPE;
+    v_sbranch student.sbranch%TYPE;
+    v_sage student.sage%TYPE;
+BEGIN
+    -- Open the cursor
+    OPEN student_cursor;
+
+    -- Loop through the cursor to fetch and display records
+    LOOP
+        -- Fetch a record from the cursor into variables
+        FETCH student_cursor INTO v_sid, v_sname, v_sbranch, v_sage;
+
+        -- Exit the loop when no more records are found
+        EXIT WHEN student_cursor%NOTFOUND;
+
+        -- Display the fetched record
+        DBMS_OUTPUT.PUT_LINE('Student ID: ' || v_sid);
+        DBMS_OUTPUT.PUT_LINE('Student Name: ' || v_sname);
+        DBMS_OUTPUT.PUT_LINE('Student Branch: ' || v_sbranch);
+        DBMS_OUTPUT.PUT_LINE('Student Age: ' || v_sage);
+        DBMS_OUTPUT.PUT_LINE('-----------------------');
+    END LOOP;
+
+    -- Close the cursor
+    CLOSE student_cursor;
+END;
+/
+=================================================================================
+Question-63. Create procedures to perform CRUD operations in student table.
+----------------------------------------------------------------------------
+Create (Insert) Procedure:
+--------------------------
+CREATE OR REPLACE PROCEDURE CreateStudent(
+    p_sid INT,
+    p_sname VARCHAR2,
+    p_sbranch VARCHAR2,
+    p_sage INT
+) AS
+BEGIN
+    INSERT INTO student (sid, sname, sbranch, sage)
+    VALUES (p_sid, p_sname, p_sbranch, p_sage);
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Student record created successfully.');
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error: Failed to create student record.');
+END CreateStudent;
+/
+
+Read (Select) Procedure:
+-------------------------
+CREATE OR REPLACE PROCEDURE ReadStudent(
+    p_sid INT
+) AS
+    v_sname student.sname%TYPE;
+    v_sbranch student.sbranch%TYPE;
+    v_sage student.sage%TYPE;
+BEGIN
+    SELECT sname, sbranch, sage
+    INTO v_sname, v_sbranch, v_sage
+    FROM student
+    WHERE sid = p_sid;
+
+    DBMS_OUTPUT.PUT_LINE('Student ID: ' || p_sid);
+    DBMS_OUTPUT.PUT_LINE('Student Name: ' || v_sname);
+    DBMS_OUTPUT.PUT_LINE('Student Branch: ' || v_sbranch);
+    DBMS_OUTPUT.PUT_LINE('Student Age: ' || v_sage);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Student with ID ' || p_sid || ' not found.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Failed to read student record.');
+END ReadStudent;
+/
+
+Update Procedure:
+--------------------
+CREATE OR REPLACE PROCEDURE UpdateStudent(
+    p_sid INT,
+    p_sname VARCHAR2,
+    p_sbranch VARCHAR2,
+    p_sage INT
+) AS
+BEGIN
+    UPDATE student
+    SET sname = p_sname,
+        sbranch = p_sbranch,
+        sage = p_sage
+    WHERE sid = p_sid;
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Student record updated successfully.');
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Student with ID ' || p_sid || ' not found.');
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error: Failed to update student record.');
+END UpdateStudent;
+/
+
+Delete Procedure:
+--------------------
+CREATE OR REPLACE PROCEDURE DeleteStudent(
+    p_sid INT
+) AS
+BEGIN
+    DELETE FROM student WHERE sid = p_sid;
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Student record deleted successfully.');
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Student with ID ' || p_sid || ' not found.');
+    WHEN OTHERS THEN
+        ROLLBACK;
+        DBMS_OUTPUT.PUT_LINE('Error: Failed to delete student record.');
+END DeleteStudent;
+/
+===========================================================================================
+question-64. Execute above all procedures from command line.
+--------------------------------------------------------------
+CreateStudent Procedure:
+-------------------------
+BEGIN
+    CreateStudent(1, 'John Doe', 'Computer Science', 22);
+END;
+/
+
+ReadStudent Procedure:
+-----------------------
+BEGIN
+    ReadStudent(1);
+END;
+/
+
+UpdateStudent Procedure:
+------------------------
+BEGIN
+    UpdateStudent(1, 'Updated Name', 'Updated Branch', 25);
+END;
+/
+
+DeleteStudent Procedure:
+------------------------
+BEGIN
+    DeleteStudent(1);
+END;
+/
+=========================================
+Question-59. What are the limitations of cursors?
+--------------------------------------------------
+Cursors are essential database objects in SQL and PL/SQL for processing rows of data in a result set. However, they also have certain limitations and considerations to keep in mind:
+
+1. **Performance Overhead:** Cursors can introduce performance overhead, especially when processing large result sets. Fetching rows one by one can be slower compared to retrieving data in a set-based manner using SQL queries. Cursors should be used judiciously to minimize performance impact.
+
+2. **Resource Consumption:** Cursors consume server resources, including memory. Each open cursor consumes memory for the result set, and too many open cursors can lead to resource contention and potential memory-related issues.
+
+3. **Complexity:** Working with cursors can make code more complex and harder to maintain. Cursor-based code often requires more lines of code compared to equivalent set-based SQL queries, making it more error-prone and challenging to understand.
+
+4. **Locking and Concurrency:** Cursors can hold locks on rows, which can affect concurrency and potentially lead to deadlock situations. Care should be taken to manage transactions and locks when using cursors in multi-user environments.
+
+5. **Limited Portability:** Cursor syntax and behavior can vary between different database systems. Code that uses cursors may not be easily portable between database platforms without modification.
+
+6. **Inefficient for Large Result Sets:** Cursors are not well-suited for processing large result sets, as they require fetching and holding all rows in memory or on disk, which can lead to resource exhaustion.
+
+7. **Limited Features:** Some cursor types, such as simple read-only cursors, may lack features like backward scrolling or dynamic SQL execution, which can limit their flexibility.
+
+8. **Not Suitable for All Use Cases:** Cursors are primarily designed for row-by-row processing. For some tasks, such as complex aggregations or calculations, using set-based SQL operations may be more efficient and appropriate.
+
+9. **Risk of Cursor Leaks:** Cursors must be explicitly closed after use. Failing to close cursors can lead to cursor leaks, where resources are not released properly, potentially impacting system performance and stability.
+
+10. **Maintenance Challenges:** Cursor-based code can be challenging to maintain, as it may involve nested cursors or complex control structures. Code changes or additions may require careful consideration of cursor logic.
+
+Despite these limitations, cursors have their place in database programming, particularly when it comes to procedural logic, row-level processing, and certain data manipulation tasks. However, it's important to use them thoughtfully and consider alternative approaches, such as set-based SQL operations, when they are more suitable for the task at hand.
+====================================================================================================================================================================================================================================================================================================
+question-58. What are the types of cursors. Explain it.
+-------------------------------------------------------
+In database programming, there are two primary types of cursors: explicit cursors and implicit cursors. These cursors serve different purposes and have different characteristics:
+
+1. **Explicit Cursors:**
+
+   Explicit cursors are user-defined cursors that you explicitly declare and manage in your code. They give you more control over the cursor's behavior, such as opening, fetching, and closing rows. Explicit cursors are commonly used in stored procedures, functions, and application code.
+
+   There are three types of explicit cursors:
+
+   - **DECLARE CURSOR:** This type of explicit cursor is declared explicitly in the code. You define the SQL query associated with the cursor, and then you can open, fetch, and close the cursor as needed. Explicit cursors are often used for row-level processing and allow you to retrieve and manipulate data one row at a time.
+
+   - **OPEN CURSOR:** Once an explicit cursor is declared, you can use the OPEN statement to execute the associated SQL query and prepare the cursor for fetching rows.
+
+   - **FETCH CURSOR:** The FETCH statement is used to retrieve rows one at a time from an open cursor. You can control the fetching behavior, specifying whether you want to fetch the next row, the prior row, or a specific row.
+
+   - **CLOSE CURSOR:** After you've finished using an explicit cursor, you can close it using the CLOSE statement. Closing the cursor releases associated resources.
+
+2. **Implicit Cursors:**
+
+   Implicit cursors are automatically created and managed by the database system. They are typically used in situations where you don't need fine-grained control over cursor operations. Implicit cursors are well-suited for executing single SQL statements and handling exceptions.
+
+   There are two common types of implicit cursors:
+
+   - **SQL%ROWCOUNT:** The SQL%ROWCOUNT attribute returns the number of rows affected by the most recent SQL statement. It is often used to check the success of data manipulation operations like INSERT, UPDATE, or DELETE.
+
+   - **SQL%FOUND and SQL%NOTFOUND:** These attributes indicate whether the most recent SQL operation resulted in any rows being found. SQL%FOUND is TRUE if rows were found, and SQL%NOTFOUND is TRUE if no rows were found. These attributes are used in conditional logic to handle the results of SELECT statements.
+
+Implicit cursors are automatically created for single SQL statements, and you don't need to declare or explicitly manage them. They provide a convenient way to handle simple SQL operations without the need for explicit cursor management.
+
+In summary, explicit cursors are user-defined and provide fine-grained control over cursor operations, making them suitable for complex row-level processing tasks. Implicit cursors, on the other hand, are automatically created and managed by the database system and are often used for single SQL statements or for handling exceptions and result checking. The choice between explicit and implicit cursors depends on the specific requirements of your database programming task.
+====================================================================================================================
+Question-57. What is cursor? Explain the uses of cursor.
+----------------------------------------------------------
+A cursor is a database object used in database management systems (DBMS) to work with result sets from SQL queries. It acts as a pointer or a handle to a specific row within a result set, allowing you to retrieve and manipulate data row by row. Cursors are particularly useful when you need to perform operations on individual rows of data within a result set, especially in procedural languages like SQL and PL/SQL.
+
+Here are some key aspects of cursors and their uses:
+
+1. **Result Set Navigation:** Cursors enable you to navigate through the rows of a result set returned by a SQL query one at a time. This is particularly valuable when you need to process records individually or perform row-level operations.
+
+2. **Row Retrieval:** Cursors provide a mechanism for retrieving data from the result set, allowing you to access and manipulate the values of individual columns in each row.
+
+3. **Positioning:** Cursors can be moved to different positions within the result set. You can move forward, backward, to a specific row, or to the first or last row, depending on the cursor type and capabilities.
+
+4. **Fetching:** Cursors allow you to fetch rows from the result set one at a time or in bulk, depending on your requirements. Fetching is the process of transferring a row from the result set to the application or code that uses the cursor.
+
+5. **Data Modification:** In addition to reading data, some cursors also support data modification operations, such as updating or deleting rows in the result set.
+
+6. **Cursor Types:** There are various types of cursors, including read-only cursors, scrollable cursors (which can move in any direction within the result set), and updatable cursors (which allow data modification).
+
+**Common Uses of Cursors:**
+
+1. **Row-Level Processing:** Cursors are often used when you need to perform operations on each row individually, such as data validation, transformation, or custom calculations.
+
+2. **Data Reporting:** Cursors can be used to generate custom reports where data from different rows or columns needs to be organized and formatted in a specific way.
+
+3. **Cursor Loops:** Cursors are frequently used in procedural languages like PL/SQL to implement cursor loops. These loops iterate through a result set, processing each row according to specified logic.
+
+4. **Data Validation:** Cursors can be used to validate data by checking individual rows against predefined criteria and raising exceptions or taking corrective actions when necessary.
+
+5. **Data Migration:** When migrating data from one table or database to another, cursors can be used to extract data from the source, transform it, and insert it into the destination table.
+
+6. **User Interaction:** In interactive applications, cursors can be used to present data to users one row at a time, allowing them to make decisions or take actions on individual records.
+
+It's important to note that while cursors are powerful and flexible, they should be used judiciously. In some cases, set-based SQL operations can achieve the same results more efficiently, so careful consideration should be given to whether cursors are the best approach for a particular task.
+======================================================================================================================================================================================
+Question-56. What is a trigger in PL/SQL?
+------------------------------------------
+In PL/SQL, a trigger is a database object that is associated with a specific table, view, schema, or database event and is automatically executed when that event occurs. Triggers are used to enforce data integrity, perform automated actions in response to database events, and extend the functionality of database systems.
+
+Here are key characteristics and uses of triggers in PL/SQL:
+
+1. **Event-Driven Execution:** Triggers are fired (executed) automatically in response to specific database events, such as INSERT, UPDATE, DELETE, or DDL (Data Definition Language) statements like CREATE, ALTER, or DROP.
+
+2. **Timing:** Triggers can be defined to execute either before (BEFORE trigger) or after (AFTER trigger) the triggering event. BEFORE triggers are often used for data validation, while AFTER triggers are used for logging or auditing purposes.
+
+3. **Row-Level or Statement-Level:** Triggers can operate on individual rows (row-level triggers) or on the entire set of affected rows (statement-level triggers) when a triggering event occurs.
+
+4. **Uses of Triggers:**
+
+   - **Data Validation:** Triggers are commonly used to enforce data integrity by checking and validating data before it is inserted, updated, or deleted in a table. For example, you can use a trigger to ensure that a specific condition is met before allowing a record to be inserted.
+
+   - **Auditing and Logging:** Triggers can be used to maintain an audit trail of changes to database tables. They can capture information about who made the change, what the change was, and when it occurred.
+
+   - **Automatic Calculations:** Triggers can perform automatic calculations or updates on related data when a change is made to a table. For example, a trigger can update a total or aggregate value whenever a relevant record is modified.
+
+   - **Complex Security Policies:** Triggers can enforce complex security policies by controlling access to data based on user roles, privileges, or other criteria.
+
+   - **Data Transformation:** Triggers can transform data before it is stored in the database. For instance, you can use a trigger to automatically convert data to uppercase or apply formatting rules.
+
+   - **Replication:** Triggers can be used in database replication scenarios to track changes made to the source database and propagate those changes to replica databases.
+
+5. **Syntax:** The syntax for defining a trigger in PL/SQL typically includes the name of the trigger, the event that triggers it (e.g., INSERT, UPDATE), the timing (BEFORE or AFTER), and the PL/SQL code or procedure that should be executed when the trigger fires.
+
+6. **Trigger Advantages and Considerations:** While triggers provide powerful functionality, they should be used carefully. Overuse of triggers can lead to complex and difficult-to-maintain code. It's essential to consider their impact on database performance and understand their order of execution in multi-trigger scenarios.
+
+In summary, a trigger in PL/SQL is a database object that automatically responds to specific database events by executing predefined code. Triggers are versatile and can be used for various purposes, including data validation, auditing, automation, and more.
+===================================================================================================================================
+Question-55. What are the 3 modes of parameter in PL/SQL?
+-----------------------------------------------------------
+In PL/SQL, there are three modes for parameters when defining procedures or functions. These modes determine how data is passed into and out of the subprogram. The three parameter modes are as follows:
+
+1. **IN Mode:** Parameters declared as IN are used for passing data into the subprogram. It means that the subprogram can read the values of IN parameters but cannot modify them. IN parameters are used when you want to pass data to a subprogram for processing but do not intend to change the original values.
+
+   Example:
+   ```plsql
+   CREATE OR REPLACE PROCEDURE ProcessData(IN_PARAM IN NUMBER) IS
+   BEGIN
+       -- IN_PARAM can be read but not modified
+       DBMS_OUTPUT.PUT_LINE('Received value: ' || IN_PARAM);
+   END;
+   ```
+
+2. **OUT Mode:** Parameters declared as OUT are used for returning values from the subprogram. The subprogram can modify the values of OUT parameters, and these modified values are returned to the caller. OUT parameters are typically used when you want a subprogram to return multiple values.
+
+   Example:
+   ```plsql
+   CREATE OR REPLACE PROCEDURE CalculateSum(IN_PARAM1 IN NUMBER, IN_PARAM2 IN NUMBER, SUM_RESULT OUT NUMBER) IS
+   BEGIN
+       -- Calculate the sum and assign it to SUM_RESULT
+       SUM_RESULT := IN_PARAM1 + IN_PARAM2;
+   END;
+   ```
+
+3. **IN OUT Mode (or INOUT Mode):** Parameters declared as IN OUT combine the behavior of both IN and OUT parameters. You can pass values into the subprogram, and the subprogram can modify the values, which are then returned to the caller. IN OUT parameters are used when you want to pass data into a subprogram, perform some processing on it, and return the modified data.
+
+   Example:
+   ```plsql
+   CREATE OR REPLACE PROCEDURE IncrementValue(IN_OUT_PARAM IN OUT NUMBER) IS
+   BEGIN
+       -- Increment the value of IN_OUT_PARAM
+       IN_OUT_PARAM := IN_OUT_PARAM + 1;
+   END;
+   ```
+
+When declaring a procedure or function in PL/SQL, you can specify the parameter mode using the IN, OUT, or IN OUT keywords for each parameter. The appropriate mode depends on the requirements of your subprogram and whether you need to pass data in, out, or both.
+======================================================================================================================
+Question-54. What is the difference between function and procedure?
+--------------------------------------------------------------------
+In PL/SQL, both functions and procedures are subprograms that allow you to encapsulate a sequence of SQL and PL/SQL statements into a reusable unit. However, they have some key differences in their purpose and behavior:
+
+**1. Return Value:**
+   - **Procedure:** A procedure does not return a value explicitly. It is used for performing a specific task or set of tasks, such as inserting data into a table, updating records, or performing calculations. Procedures can have OUT or IN OUT parameters to return values, but they do not have a return statement.
+   - **Function:** A function is designed to return a single value explicitly using the `RETURN` statement. Functions are typically used for calculations or data retrieval tasks where you need to obtain a result.
+
+**2. Usage in SQL Statements:**
+   - **Procedure:** Procedures cannot be used directly in SQL statements. They are typically called and executed from PL/SQL code or other procedures/functions.
+   - **Function:** Functions can be used directly in SQL statements. You can include a function call within a SQL query to retrieve a value, and the result can be used as part of the query.
+
+**3. Return Type:**
+   - **Procedure:** Procedures do not have a return type.
+   - **Function:** Functions have a defined return type, which specifies the data type of the value they return.
+
+**4. CALL Statement:**
+   - **Procedure:** To call a procedure, you use the `CALL` statement in PL/SQL.
+   - **Function:** To call a function, you can use it like any other expression, either in PL/SQL code or directly within SQL statements.
+
+Here's a basic example illustrating the difference between a procedure and a function:
+
+```plsql
+-- Procedure: No return value
+CREATE OR REPLACE PROCEDURE InsertData(
+    p_name VARCHAR2,
+    p_age NUMBER
+) AS
+BEGIN
+    INSERT INTO employees (name, age) VALUES (p_name, p_age);
+    COMMIT;
+END;
+
+-- Function: Returns a value
+CREATE OR REPLACE FUNCTION CalculateSalary(
+    p_employee_id NUMBER
+) RETURN NUMBER IS
+    v_salary NUMBER;
+BEGIN
+    SELECT salary INTO v_salary FROM employee_salary WHERE emp_id = p_employee_id;
+    RETURN v_salary;
+END;
+```
+
+In this example:
+- `InsertData` is a procedure that inserts data into an "employees" table but does not return a value.
+- `CalculateSalary` is a function that calculates and returns the salary for a given employee ID.
+
+In summary, the main difference between a function and a procedure is that a function returns a value, while a procedure does not. The choice between using a function or a procedure depends on your specific requirements for data retrieval, calculations, and data manipulation.
+=============================================================================================================================
+Question-53. Explain the basic structure followed in PL/SQL?
+-------------------------------------------------------------
+PL/SQL (Procedural Language/Structured Query Language) is a powerful extension of SQL used for database programming in Oracle Database and other compatible database systems. PL/SQL follows a structured and modular programming approach. The basic structure of a PL/SQL program consists of various components and blocks, each serving a specific purpose. Here's the basic structure of a PL/SQL program:
+
+1. **DECLARE Section:**
+   - The `DECLARE` section is optional and is used to declare variables, constants, and cursors that will be used throughout the program.
+   - Variables are used to store and manipulate data within the program.
+   - Constants are used for defining values that do not change during program execution.
+   - Cursors are used for processing query results row by row.
+
+   Example:
+   ```plsql
+   DECLARE
+       v_employee_name VARCHAR2(50);
+       v_salary CONSTANT NUMBER := 50000;
+       CURSOR employee_cursor IS
+           SELECT employee_id, employee_name FROM employees;
+   BEGIN
+       -- Rest of the program
+   END;
+   ```
+
+2. **BEGIN Section:**
+   - The `BEGIN` section is where the main logic of the program is written. It contains a sequence of SQL and PL/SQL statements that perform specific tasks.
+   - This section can include conditional statements (IF-THEN-ELSE), loops (FOR, WHILE), and exception handling blocks.
+
+   Example:
+   ```plsql
+   BEGIN
+       -- SQL and PL/SQL statements
+       INSERT INTO employees (employee_id, employee_name) VALUES (1, 'John Doe');
+       COMMIT;
+       
+       IF v_salary > 50000 THEN
+           DBMS_OUTPUT.PUT_LINE('High Salary');
+       ELSE
+           DBMS_OUTPUT.PUT_LINE('Low Salary');
+       END IF;
+   END;
+   ```
+
+3. **EXCEPTION Section:**
+   - The `EXCEPTION` section is optional and is used to handle exceptions or errors that may occur during program execution.
+   - You can define custom exception handlers to catch and handle specific types of errors or use the generic `OTHERS` handler to handle any unhandled exceptions.
+
+   Example:
+   ```plsql
+   EXCEPTION
+       WHEN NO_DATA_FOUND THEN
+           DBMS_OUTPUT.PUT_LINE('No data found.');
+       WHEN OTHERS THEN
+           DBMS_OUTPUT.PUT_LINE('An error occurred.');
+   ```
+
+4. **END Section:**
+   - The `END` keyword marks the end of the PL/SQL block.
+   - After the `END` keyword, you can include additional blocks or procedures/functions if needed.
+
+5. **Comments:**
+   - PL/SQL supports both single-line (`--`) and multi-line (`/* */`) comments. Comments are used to document the code and make it more readable.
+
+   Example:
+   ```plsql
+   -- This is a single-line comment
+   
+   /*
+   This is a multi-line comment
+   that spans multiple lines.
+   */
+   ```
+
+Here's an example of a complete PL/SQL program structure:
+
+```plsql
+DECLARE
+   v_employee_name VARCHAR2(50);
+   v_salary CONSTANT NUMBER := 50000;
+   CURSOR employee_cursor IS
+       SELECT employee_id, employee_name FROM employees;
+BEGIN
+   -- Main logic of the program
+   INSERT INTO employees (employee_id, employee_name) VALUES (1, 'John Doe');
+   COMMIT;
+   
+   IF v_salary > 50000 THEN
+       DBMS_OUTPUT.PUT_LINE('High Salary');
+   ELSE
+       DBMS_OUTPUT.PUT_LINE('Low Salary');
+   END IF;
+EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+       DBMS_OUTPUT.PUT_LINE('No data found.');
+   WHEN OTHERS THEN
+       DBMS_OUTPUT.PUT_LINE('An error occurred.');
+END;
+```
+
+This basic structure serves as a template for PL/SQL programs, and you can build more complex programs by combining multiple blocks, procedures, functions, and control structures as needed to achieve your specific tasks and business logic.
+========================================================================================================================
+Question-52. What is PL/SQL. Explain some features of it.
+----------------------------------------------------------
+PL/SQL (Procedural Language/Structured Query Language) is a powerful and versatile programming language extension for SQL (Structured Query Language) used in Oracle Database and other compatible database systems. It enables developers to build robust, data-centric applications with the following key features:
+
+1. **Procedural Capabilities:** PL/SQL supports procedural programming constructs like loops, conditionals, and exception handling, allowing for complex business logic and control flow within database programs.
+
+2. **Integration with SQL:** PL/SQL seamlessly integrates with SQL, enabling the manipulation of database data, execution of queries, and execution of data definition statements (DDL) within PL/SQL code.
+
+3. **Modularity:** PL/SQL promotes modularity through the use of functions, procedures, and packages, making it easier to manage and maintain code in a structured manner.
+
+4. **Error Handling:** Robust error handling is supported with detailed exception handling mechanisms, allowing developers to gracefully handle unexpected issues in their code.
+
+5. **Cursors:** PL/SQL provides cursors for iterating through query results and enables developers to fetch and process rows one at a time.
+
+6. **Security:** PL/SQL code can be stored securely on the database server, reducing the risk of unauthorized access and ensuring data integrity.
+
+7. **Scalability:** PL/SQL is highly scalable and can efficiently process large volumes of data, making it suitable for enterprise-level applications.
+
+8. **Performance Optimization:** Developers can optimize performance by using techniques such as bulk processing, array processing, and database triggers.
+
+9. **Dynamic SQL:** PL/SQL allows for the dynamic generation and execution of SQL statements, enhancing flexibility and adaptability in database applications.
+
+10. **Extensibility:** Developers can create custom functions and procedures, extending the functionality of the database to meet specific business requirements.
+
+11. **Transaction Control:** PL/SQL enables developers to manage database transactions explicitly, ensuring data consistency and reliability.
+
+12. **Code Reusability:** Through the use of packages and modular programming, PL/SQL code can be easily reused across different parts of an application or even across multiple applications.
+
+PL/SQL's combination of SQL and procedural programming features makes it a robust and versatile language for developing database-centric applications, ranging from simple data retrieval tasks to complex business processes. Its tight integration with Oracle Database makes it the preferred choice for Oracle-based applications.
+=======================================================================================================================
+Question-51. Explain commit, rollback and savepoint.
+----------------------------------------------------
+In database management systems (DBMS), particularly in SQL-based systems like Oracle Database, `COMMIT`, `ROLLBACK`, and `SAVEPOINT` are commands and concepts used to manage transactions and ensure data integrity:
+
+1. **COMMIT:**
+   - `COMMIT` is a SQL command used to permanently save all changes made during the current transaction to the database.
+   - When a `COMMIT` command is executed, all the changes made since the transaction began (e.g., INSERTs, UPDATEs, DELETEs) are made permanent, and they become visible to other transactions.
+   - A successful `COMMIT` effectively ends the transaction, and the changes are committed to the database.
+   - If a transaction is not explicitly committed using `COMMIT` and it is terminated (e.g., due to an error or a disconnect), the changes made within that transaction are rolled back, ensuring that the database remains in a consistent state.
+
+   Example:
+   ```sql
+   -- Start a transaction
+   BEGIN
+       -- SQL statements here (INSERT, UPDATE, DELETE)
+       
+       -- Commit the transaction to make the changes permanent
+       COMMIT;
+   END;
+   ```
+
+2. **ROLLBACK:**
+   - `ROLLBACK` is a SQL command used to undo or cancel all changes made during the current transaction.
+   - When a `ROLLBACK` command is executed, any changes made within the current transaction are discarded, and the database is returned to the state it was in at the beginning of the transaction.
+   - `ROLLBACK` is typically used when an error occurs or when a transaction needs to be canceled for any reason.
+
+   Example:
+   ```sql
+   -- Start a transaction
+   BEGIN
+       -- SQL statements here (INSERT, UPDATE, DELETE)
+       
+       -- Rollback the transaction to discard changes
+       ROLLBACK;
+   END;
+   ```
+
+3. **SAVEPOINT:**
+   - A `SAVEPOINT` is a point within a transaction to which you can later roll back if needed, without rolling back the entire transaction.
+   - It allows you to create named markers within a transaction, so you can return to specific points in the transaction if an error occurs or if you need to undo part of the work.
+   - You can set multiple `SAVEPOINT`s within a single transaction.
+   - To roll back to a specific `SAVEPOINT`, you use the `ROLLBACK TO` command followed by the name of the `SAVEPOINT`.
+
+   Example:
+   ```sql
+   -- Start a transaction
+   BEGIN
+       -- SQL statements here (INSERT, UPDATE, DELETE)
+       
+       -- Create a SAVEPOINT
+       SAVEPOINT my_savepoint;
+       
+       -- More SQL statements
+       
+       -- Roll back to the SAVEPOINT if needed
+       ROLLBACK TO my_savepoint;
+   END;
+   ```
+
+These commands and concepts are crucial for managing data consistency and ensuring that database transactions can be either committed to make their changes permanent or rolled back to maintain data integrity in case of errors or undesired outcomes. `SAVEPOINT`s offer an additional level of control for more granular rollback operations within a transaction.
+=====================================================================================================================
+Question-50. What is Sub Query? Explain with Example.
+---------------------------------------------------------
+A subquery, also known as a nested query or inner query, is a SQL query embedded within another SQL statement, such as a SELECT, INSERT, UPDATE, or DELETE statement. Subqueries are used to retrieve data that will be used as a condition or value in the outer query. Subqueries are a powerful tool in SQL for performing complex queries and data manipulations.
+
+Here's the basic syntax of a subquery:
+
+```sql
+SELECT column1, column2, ...
+FROM table1
+WHERE columnN operator (SELECT columnX FROM tableY WHERE condition);
+```
+
+Let's explain subqueries with an example:
+
+Suppose you have two tables: "employees" and "departments." The "employees" table contains information about employees, including their names, salaries, and department IDs, while the "departments" table contains information about departments, including department IDs and names.
+
+**Example:** Find the names of employees who work in the "Sales" department.
+
+You can achieve this using a subquery. Here's the SQL query:
+
+```sql
+SELECT first_name, last_name
+FROM employees
+WHERE department_id = (SELECT department_id FROM departments WHERE department_name = 'Sales');
+```
+
+In this example:
+
+- The outer query retrieves employee names (`first_name` and `last_name`) from the "employees" table.
+- The inner query (subquery) retrieves the department ID for the "Sales" department from the "departments" table. This subquery is enclosed in parentheses and provides a condition for the outer query.
+- The outer query uses the department ID obtained from the subquery as a condition to filter the rows from the "employees" table. Only employees whose department IDs match the ID of the "Sales" department are selected.
+
+The result of this query will be a list of employee names who work in the "Sales" department.
+
+Subqueries can be used in various parts of SQL statements, including the WHERE clause, SELECT clause, FROM clause, and more, to perform operations like filtering data, calculating aggregate values, and more. They provide a way to break down complex problems into smaller, more manageable parts and are a fundamental tool in SQL for querying and manipulating data.
+======================================================================================================================
+Question-49. What is Join Explain? Explain types of Joins.
+---------------------------------------------------------
+In SQL, a JOIN operation is used to combine rows from two or more tables based on a related column between them. The purpose of a JOIN is to retrieve and consolidate data from multiple tables into a single result set, allowing you to access and analyze related information together. JOINs are a fundamental concept in relational databases for querying and linking data.
+
+There are several types of JOINs in SQL:
+
+1. **INNER JOIN:**
+   - An INNER JOIN returns only the rows from both tables that have matching values in the specified columns. Rows with non-matching values are excluded from the result set.
+   - This type of JOIN is used when you want to retrieve data where there is a match between the specified columns in both tables.
+
+   Example:
+   ```sql
+   SELECT employees.employee_id, employees.first_name, departments.department_name
+   FROM employees
+   INNER JOIN departments ON employees.department_id = departments.department_id;
+   ```
+
+2. **LEFT JOIN (or LEFT OUTER JOIN):**
+   - A LEFT JOIN returns all the rows from the left table (the "left" side of the JOIN) and the matching rows from the right table. If there is no match in the right table, NULL values are included.
+   - LEFT JOIN is useful when you want to retrieve all records from one table and any related records from another table, even if some records in the left table have no match in the right table.
+
+   Example:
+   ```sql
+   SELECT customers.customer_id, customers.customer_name, orders.order_date
+   FROM customers
+   LEFT JOIN orders ON customers.customer_id = orders.customer_id;
+   ```
+
+3. **RIGHT JOIN (or RIGHT OUTER JOIN):**
+   - A RIGHT JOIN is similar to a LEFT JOIN but returns all rows from the right table and the matching rows from the left table. If there is no match in the left table, NULL values are included.
+   - RIGHT JOIN is less commonly used than LEFT JOIN, as it can be rewritten as a LEFT JOIN with the tables reversed.
+
+   Example:
+   ```sql
+   SELECT orders.order_id, orders.order_date, employees.first_name
+   FROM orders
+   RIGHT JOIN employees ON orders.employee_id = employees.employee_id;
+   ```
+
+4. **FULL JOIN (or FULL OUTER JOIN):**
+   - A FULL JOIN returns all rows when there is a match in either the left or the right table. If there is no match in one of the tables, NULL values are included for the columns from the table with no match.
+   - FULL JOIN is used to retrieve all records from both tables, regardless of whether there is a match or not.
+
+   Example:
+   ```sql
+   SELECT customers.customer_id, customers.customer_name, orders.order_date
+   FROM customers
+   FULL JOIN orders ON customers.customer_id = orders.customer_id;
+   ```
+
+5. **CROSS JOIN (or Cartesian JOIN):**
+   - A CROSS JOIN returns the Cartesian product of two tables, meaning it combines every row from the first table with every row from the second table, resulting in a large result set.
+   - CROSS JOINs are used when you need to combine all possible combinations of rows from two tables.
+
+   Example:
+   ```sql
+   SELECT products.product_name, suppliers.supplier_name
+   FROM products
+   CROSS JOIN suppliers;
+   ```
+
+These are the most common types of JOINs in SQL. The choice of which JOIN type to use depends on the specific data retrieval requirements and relationships between the tables in your database. JOINs allow you to leverage the relational nature of databases and create meaningful, integrated views of data from multiple sources.
+==============================================================================================================================
+Question-48. How to use LIKE operator? Explain IN, EXITS operators.
+-------------------------------------------------------------------
+The `LIKE` operator and the `IN` and `EXISTS` operators are essential SQL operators used for filtering and comparing data in SQL queries. Here's an explanation of each:
+
+**LIKE Operator:**
+The `LIKE` operator is used to filter rows in a table based on a specified pattern within a column. It is typically used with text data types (e.g., VARCHAR or CHAR). The pattern can include wildcard characters:
+
+- `%`: Represents zero or more characters.
+- `_`: Represents a single character.
+
+Here are some common patterns for using the `LIKE` operator:
+
+1. To find values that start with a specific substring:
+   ```sql
+   SELECT column_name
+   FROM table_name
+   WHERE column_name LIKE 'prefix%';
+   ```
+
+2. To find values that end with a specific substring:
+   ```sql
+   SELECT column_name
+   FROM table_name
+   WHERE column_name LIKE '%suffix';
+   ```
+
+3. To find values that contain a specific substring anywhere within the column:
+   ```sql
+   SELECT column_name
+   FROM table_name
+   WHERE column_name LIKE '%substring%';
+   ```
+
+4. To find values where a particular character occurs at a specific position:
+   ```sql
+   SELECT column_name
+   FROM table_name
+   WHERE column_name LIKE '_X%'; -- Any value where the second character is 'X'
+   ```
+
+**IN Operator:**
+The `IN` operator is used to filter rows based on a list of values. It allows you to specify a list of values that you want to compare to a column, and it returns rows where the column's value matches any of the specified values.
+
+Example:
+```sql
+SELECT column_name
+FROM table_name
+WHERE column_name IN (value1, value2, value3);
+```
+
+**EXISTS Operator:**
+The `EXISTS` operator is used to check for the existence of rows in a subquery's result set. It returns `TRUE` if the subquery returns at least one row; otherwise, it returns `FALSE`. The `EXISTS` operator is often used in conjunction with a correlated subquery, where the subquery references values from the outer query.
+
+Example:
+```sql
+SELECT column_name
+FROM table_name
+WHERE EXISTS (SELECT 1 FROM another_table WHERE condition);
+```
+
+In the `EXISTS` example, the subquery is evaluated for each row in the outer query, and if the subquery returns at least one row that satisfies the condition, the outer row is included in the result set.
+
+These operators are powerful tools for filtering and selecting data in SQL queries, allowing you to search for specific patterns, values in a list, or the existence of data based on certain criteria.
+===================================================================================================================
+Question-47. What is Primary Key and Foreign Key? Explain.
+-----------------------------------------------------------
+**Primary Key:**
+A primary key is a field or a set of fields in a database table that uniquely identifies each record (row) in that table. It enforces data integrity and ensures that each row in the table has a unique identifier. The primary key constraint also ensures that the key fields do not contain NULL values.
+
+Key characteristics of a primary key:
+
+1. **Uniqueness:** Every value in the primary key column(s) must be unique within the table. No two rows can have the same primary key value.
+
+2. **Uniqueness Enforcement:** The database management system (DBMS) enforces the uniqueness constraint automatically, preventing the insertion of duplicate values.
+
+3. **Non-NULL Values:** The primary key column(s) cannot contain NULL values. Every record must have a valid primary key value.
+
+4. **Indexing:** Primary keys are often indexed by the DBMS for efficient data retrieval, which can improve query performance.
+
+5. **Foreign Key Reference:** A primary key in one table can be referenced by foreign keys in other tables to establish relationships between tables (e.g., a parent-child relationship).
+
+**Foreign Key:**
+A foreign key is a field or a set of fields in a database table that establishes a link or relationship between the data in two tables. It enforces referential integrity by ensuring that the values in the foreign key column(s) match the values in the primary key column(s) of another (referenced) table. Foreign keys are used to create relationships between tables, typically defining how data in one table relates to data in another table.
+
+Key characteristics of a foreign key:
+
+1. **Referential Integrity:** A foreign key ensures that the values in the foreign key column(s) of one table exist in the corresponding primary key column(s) of another table. This enforces referential integrity and prevents orphaned records.
+
+2. **Relationships:** Foreign keys are used to establish relationships between tables, such as parent-child relationships in a relational database.
+
+3. **CASCADE Actions:** When a foreign key constraint is defined with CASCADE actions (e.g., CASCADE DELETE or CASCADE UPDATE), changes to the primary key values in the referenced table can automatically propagate to related records in the table with the foreign key.
+
+4. **Optional vs. Mandatory:** Depending on how the foreign key constraint is defined, it can be optional (allowing NULL values) or mandatory (requiring non-NULL values).
+
+5. **Multiple Foreign Keys:** A table can have multiple foreign keys, each linking it to different related tables.
+
+Example:
+Consider two tables, "Customers" and "Orders." The "Customers" table might have a primary key column "CustomerID," and the "Orders" table might have a foreign key column "CustomerID" that references the "CustomerID" column in the "Customers" table. This establishes a relationship between customers and their orders, ensuring that each order is associated with a valid customer.
+
+In summary, a primary key uniquely identifies records within a table, while a foreign key establishes relationships between tables by linking the values in one table to the values in another. Together, they play a crucial role in maintaining data integrity and supporting data relationships in relational databases.
+========================================================================================================================
+Question-46. Difference between DELETE and TRUNCATE.
+-----------------------------------------------------
+`DELETE` and `TRUNCATE` are both SQL commands used to remove data from database tables, but they have distinct differences in terms of their functionality, behavior, and use cases:
+
+**DELETE:**
+
+1. **Functionality:**
+   - `DELETE` is a DML (Data Manipulation Language) command used to remove specific rows from a table based on a specified condition.
+   - It can be used to delete specific rows that meet certain criteria or to delete all rows from a table.
+
+2. **Row Deletion:**
+   - `DELETE` removes rows one at a time, and for each deleted row, it generates individual log entries, allowing you to roll back individual transactions if necessary.
+
+3. **Transaction Control:**
+   - `DELETE` can be executed within a transaction, allowing you to control when the changes are committed or rolled back using `COMMIT` or `ROLLBACK`.
+
+4. **WHERE Clause:**
+   - You can use a `WHERE` clause with `DELETE` to specify which rows should be deleted based on certain conditions.
+
+5. **Referential Integrity:**
+   - When you use `DELETE`, it respects foreign key constraints, ensuring that related records in other tables are not orphaned.
+
+6. **Granular Control:**
+   - `DELETE` provides granular control over which rows are deleted, allowing you to be selective based on specific criteria.
+
+**TRUNCATE:**
+
+1. **Functionality:**
+   - `TRUNCATE` is a DDL (Data Definition Language) command used to remove all rows from a table, effectively deleting all data in the table.
+
+2. **Table Truncation:**
+   - `TRUNCATE` removes all rows from the table in a single operation, and it does not generate individual log entries for each row. It is a faster operation compared to `DELETE` for large tables.
+
+3. **Transaction Control:**
+   - Unlike `DELETE`, `TRUNCATE` cannot be rolled back because it is considered a DDL command, not a DML command. Once you execute `TRUNCATE`, the data is permanently removed.
+
+4. **No WHERE Clause:**
+   - `TRUNCATE` does not allow the use of a `WHERE` clause, so it removes all rows without condition.
+
+5. **Referential Integrity:**
+   - `TRUNCATE` may not always respect foreign key constraints, depending on the database system and its settings. Some database systems might require that you disable or drop foreign key constraints before using `TRUNCATE`.
+
+**Use Cases:**
+
+- Use `DELETE` when you need to remove specific rows from a table based on conditions or when you want to perform row-level operations and maintain transaction control.
+- Use `TRUNCATE` when you want to remove all rows from a table quickly and efficiently, especially when you don't need to maintain transaction control or when you want to reset the table's data.
+
+In summary, the choice between `DELETE` and `TRUNCATE` depends on your specific requirements, such as the need for granular row-level control, transaction management, and the performance impact on large tables.
+==============================================================================================================================================================================================
+Question-45. Explain DDL, DML and DQL Commands.
+------------------------------------------------
+In SQL (Structured Query Language), commands are categorized into three main types based on their purpose and functionality: DDL (Data Definition Language), DML (Data Manipulation Language), and DQL (Data Query Language). Each type of command serves a distinct role in database management:
+
+**1. DDL (Data Definition Language):**
+   - DDL commands are used for defining, modifying, and managing the structure and schema of a database. They are primarily concerned with creating and altering database objects.
+   - Common DDL commands include:
+     - `CREATE`: Used to create new database objects, such as tables, indexes, views, and constraints.
+     - `ALTER`: Used to modify the structure of existing database objects, like adding, deleting, or modifying columns in a table.
+     - `DROP`: Used to delete or remove existing database objects, such as tables, indexes, views, and constraints.
+     - `TRUNCATE`: Used to remove all rows from a table but retain the table structure (a form of data removal).
+     - `RENAME`: Used to change the name of a database object.
+   - Example DDL command: `CREATE TABLE`, `ALTER TABLE`, `DROP INDEX`.
+
+**2. DML (Data Manipulation Language):**
+   - DML commands are used for manipulating data stored in a database. They allow you to insert, update, delete, and retrieve data from database tables.
+   - Common DML commands include:
+     - `INSERT`: Used to add new rows of data into a table.
+     - `UPDATE`: Used to modify existing data in a table.
+     - `DELETE`: Used to remove rows from a table based on specified conditions.
+     - `SELECT`: Used to retrieve data from one or more tables (also considered a DQL command, as it can be used for querying).
+   - Example DML command: `INSERT INTO`, `UPDATE`, `DELETE FROM`.
+
+**3. DQL (Data Query Language):**
+   - DQL commands are used exclusively for querying and retrieving data from a database. They do not modify the data or the database structure.
+   - The primary DQL command is `SELECT`, which allows you to retrieve data from one or more tables based on specified criteria.
+   - DQL commands enable you to perform complex queries, filter data, and aggregate results.
+   - Example DQL command: `SELECT`.
+
+Example usages:
+
+- DDL: Creating tables, modifying columns, adding indexes.
+  ```sql
+  CREATE TABLE employees (
+      employee_id INT PRIMARY KEY,
+      first_name VARCHAR(50),
+      last_name VARCHAR(50)
+  );
+
+  ALTER TABLE employees
+  ADD COLUMN hire_date DATE;
+
+  DROP TABLE employees;
+  ```
+
+- DML: Inserting, updating, and deleting data.
+  ```sql
+  INSERT INTO employees (employee_id, first_name, last_name)
+  VALUES (1, 'John', 'Doe');
+
+  UPDATE employees
+  SET first_name = 'Jane'
+  WHERE employee_id = 1;
+
+  DELETE FROM employees
+  WHERE last_name = 'Doe';
+  ```
+
+- DQL: Retrieving data.
+  ```sql
+  SELECT first_name, last_name
+  FROM employees
+  WHERE hire_date >= '2022-01-01';
+  ```
+
+In summary, DDL commands are used for defining and managing the structure of a database, DML commands are used for manipulating data, and DQL commands are used for querying and retrieving data from the database. These three types of commands together provide comprehensive control over a relational database system.
+=========================================================================================================================
+Question-43. What is Database? What is Table in a Database?
+-------------------------------------------------------------
+A **database** is a structured collection of data that is organized and stored in a computer or data storage system. Databases are designed to efficiently manage, store, retrieve, and manipulate data, making it accessible and usable for various purposes, such as data analysis, reporting, and application development.
+
+Key characteristics of databases include:
+
+1. **Structured Data:** Databases store data in a structured format, typically organized into tables, rows, and columns. This structure allows for efficient data retrieval and manipulation.
+
+2. **Data Integrity:** Databases enforce data integrity constraints, such as primary keys, foreign keys, and data types, to ensure data accuracy and consistency.
+
+3. **Concurrency Control:** Databases support multiple users or applications accessing and modifying data simultaneously while maintaining data consistency and preventing conflicts.
+
+4. **Data Security:** Databases provide mechanisms to control access to data, ensuring that only authorized users or applications can interact with specific data sets.
+
+5. **Transaction Management:** Databases support transactions, which are sequences of one or more SQL operations that are treated as a single unit of work. Transactions ensure that data changes are atomic (either all changes succeed or none do), consistent, isolated (not visible to other transactions until committed), and durable (persistently stored).
+
+6. **Query Language:** Databases use query languages (such as SQL) to interact with and retrieve data. These languages allow users and applications to specify what data they want and how they want it retrieved.
+
+7. **Indexes:** Databases often use indexes to optimize data retrieval. Indexes are data structures that provide fast access to specific rows in a table based on the values in one or more columns.
+
+A **table** in a database is one of the fundamental components used to store and organize data. A table is a two-dimensional structure consisting of rows and columns. Each row in a table represents a single record or entity, while each column represents a specific attribute or field of that entity. The intersection of a row and a column is called a **cell**, which contains a single piece of data.
+
+For example, consider a database for managing employee information. You might have an "Employees" table with columns like "EmployeeID," "FirstName," "LastName," "Email," "Salary," and so on. Each row in the "Employees" table would represent a single employee, and each column would store specific information about that employee, such as their name, email address, and salary.
+
+Tables are essential for organizing and structuring data in a database, making it possible to efficiently store, retrieve, and manipulate large volumes of information. They are a foundational concept in relational databases, which are the most common type of databases used in various applications and industries.
+========================================================================================================================
+Question-2. Create Table Department with following properties –
+Field/Column Name Type Size Constraint
+dept_id Int - Primary Key
+dept_Name Varchar 50 -
+-------------------------------
+CREATE TABLE Department (
+    dept_id INT PRIMARY KEY,
+    dept_Name VARCHAR(50)
+);
+=======================================
+Question-3. Create Table Project with following properties –
+Field/Column Name Type Size Constraint
+Project_id Int - Primary Key
+Project_Name Varchar 200 -
+Client_Name Varchar 50 -
+Technology Varchar 20 -
+Due_date Date - -
+------------------------------
+CREATE TABLE Project (
+    Project_id INT PRIMARY KEY,
+    Project_Name VARCHAR(200),
+    Client_Name VARCHAR(50),
+    Technology VARCHAR(20),
+    Due_date DATE
+);
+=====================================================
+Question-4.  Create Table EMP_INFO with following properties –
+Field/Column Name Type Size Constraint
+Emp_id Int - Primary Key
+Emp_Name Varchar 50 -
+Dept_id int - FK to Dept_id of Department
+Table
+Address Varchar 200 -
+ 
+Mob Varchar 15 -
+Salary Int - -
+Join_date Date - -
+Technology Varchar 20 -
+Project_id Int - FK to Project_id
+---------------------------------------
+CREATE TABLE EMP_INFO (
+    Emp_id INT PRIMARY KEY,
+    Emp_Name VARCHAR(50),
+    Dept_id INT,
+    Address VARCHAR(200),
+    Mob VARCHAR(15),
+    Salary INT,
+    Join_date DATE,
+    Technology VARCHAR(20),
+    Project_id INT,
+    FOREIGN KEY (Dept_id) REFERENCES Department(dept_id),
+    FOREIGN KEY (Project_id) REFERENCES Project(Project_id)
+);
+=============================================================
+Question-5. Add Following Records in EMP_INFO Table –
+Emp_i
+d Emp_Name Dept_i
+d Address Mob Salary Join_date Technol
+ogy
+Project_
+id
+101 Swapnam 501
+Noida
+Sector
+59
++918817308696 25000 2021-02-15 .NET 911
+102 Amit 681 Noida
+Sector 33 +916317305496 90000 2015-01-25 JAVA 912
+103 Jayshanker 501 Noida
+Sector 18 +919559654200 75000 2016-02-20 Python 945
+104 Vijay prakash 501 Noida
+Sector 16 +919936453447 60000 2018-02-01 JAVA 912
+105 Shivprashad 501 Noida
+Sector 66 +919026961168 25000 2022-02-10 .NET 911
+106 Shivani 689 Noida
+Sector 56 +917860353554 28000 2022-02-15 Python 945
+107 BhanuPratap 681
+Noida
+Sector
+88
++919099237352 70000 2016-02-05 React 945
+----------------------------------------------
+-- Insert the first record
+INSERT INTO EMP_INFO (Emp_id, Emp_Name, Dept_id, Address, Mob, Salary, Join_date, Technology, Project_id)
+VALUES (101, 'Swapnam', 501, 'Noida Sector 59', '+918817308696', 25000, '2021-02-15', '.NET', 911);
+
+-- Insert the second record
+INSERT INTO EMP_INFO (Emp_id, Emp_Name, Dept_id, Address, Mob, Salary, Join_date, Technology, Project_id)
+VALUES (102, 'Amit', 681, 'Noida Sector 33', '+916317305496', 90000, '2015-01-25', 'JAVA', 912);
+
+-- Insert the third record
+INSERT INTO EMP_INFO (Emp_id, Emp_Name, Dept_id, Address, Mob, Salary, Join_date, Technology, Project_id)
+VALUES (103, 'Jayshanker', 501, 'Noida Sector 18', '+919559654200', 75000, '2016-02-20', 'Python', 945);
+
+-- Insert the fourth record
+INSERT INTO EMP_INFO (Emp_id, Emp_Name, Dept_id, Address, Mob, Salary, Join_date, Technology, Project_id)
+VALUES (104, 'Vijay Prakash', 501, 'Noida Sector 16', '+919936453447', 60000, '2018-02-01', 'JAVA', 912);
+
+-- Insert the fifth record
+INSERT INTO EMP_INFO (Emp_id, Emp_Name, Dept_id, Address, Mob, Salary, Join_date, Technology, Project_id)
+VALUES (105, 'Shivprashad', 501, 'Noida Sector 66', '+919026961168', 25000, '2022-02-10', '.NET', 911);
+
+-- Insert the sixth record
+INSERT INTO EMP_INFO (Emp_id, Emp_Name, Dept_id, Address, Mob, Salary, Join_date, Technology, Project_id)
+VALUES (106, 'Shivani', 689, 'Noida Sector 56', '+917860353554', 28000, '2022-02-15', 'Python', 945);
+
+-- Insert the seventh record
+INSERT INTO EMP_INFO (Emp_id, Emp_Name, Dept_id, Address, Mob, Salary, Join_date, Technology, Project_id)
+VALUES (107, 'BhanuPratap', 681, 'Noida Sector 88', '+919099237352', 70000, '2016-02-05', 'React', 945);
+==========================================================================================================
+Question-6. Add Following Records in Department Table –
+dept_id dept_Name
+501 Development
+681 Designing
+689 Support
+--------------------
+-- Insert the first record
+INSERT INTO Department (dept_id, dept_Name)
+VALUES (501, 'Development');
+
+-- Insert the second record
+INSERT INTO Department (dept_id, dept_Name)
+VALUES (681, 'Designing');
+
+-- Insert the third record
+INSERT INTO Department (dept_id, dept_Name)
+VALUES (689, 'Support');
+===================================================
+question-7. Add Following Records in Project Table –
+Project_id Project Name Client_Name Technology Due_date
+911 UCI WEB PORTAL UCI Azamgarh .NET 2022-10-21
+912 Home Décor Home Decorators
+Chitrakoot JAVA 2022-9-24
+945 Home Tutors Home Tutors
+Lucknow Python 2022-8-31
+------------------------------------
+-- Assuming you have a "Project" table with columns: Project_id, Project_Name, Client_Name, Technology, Due_date
+
+-- Insert the first record
+INSERT INTO Project (Project_id, Project_Name, Client_Name, Technology, Due_date)
+VALUES (911, 'UCI WEB PORTAL', 'UCI Azamgarh', '.NET', '2022-10-21');
+
+-- Insert the second record
+INSERT INTO Project (Project_id, Project_Name, Client_Name, Technology, Due_date)
+VALUES (912, 'Home Décor', 'Home Decorators', 'Chitrakoot', 'JAVA', '2022-9-24');
+
+-- Insert the third record
+INSERT INTO Project (Project_id, Project_Name, Client_Name, Technology, Due_date)
+VALUES (945, 'Home Tutors', 'Home Tutors', 'Lucknow', 'Python', '2022-8-31');
+===========================================================================================
+Question-8. Select all records from EMP_INFO table.
+----------------------------------------------------
+SELECT * FROM EMP_INFO;
+============================
+Question-9. Select all records from Department table.
+-----------------------------------------------------
+SELECT * FROM Department;
+========================================================
+Question-10. Select all records from Project table.
+------------------------------------------------------------
+SELECT * FROM Project;
+============================================================
+Question-11. Select Employee who is having salary more than 50000.
+---------------------------------------------------------------------
+SELECT * FROM EMP_INFO
+WHERE Salary > 50000;
+===================================================================
+Question-12. Select Employee who is having salary less than 50000.
+--------------------------------------------------------------------
+SELECT * FROM EMP_INFO
+WHERE Salary < 50000;
+=====================================================================
+Question-13. Select Employee whose salary is 50000.
+---------------------------------------------------------------------
+SELECT * FROM EMP_INFO
+WHERE Salary = 50000;
+=======================================================================
+Question-14. Select Employee who is having salary is more than 25000 and less than 50000.
+---------------------------------------------------------------------------------------------
+SELECT * FROM EMP_INFO
+WHERE Salary > 25000 AND Salary < 50000;
+===========================================================
+Question-15. Select Employee who is having maximum salary.
+-----------------------------------------------------------
+SELECT * FROM EMP_INFO
+WHERE Salary = (SELECT MAX(Salary) FROM EMP_INFO);
+=====================================================
+Question-16. Select Employee who is having minimum salary.
+------------------------------------------------------------
+SELECT * FROM EMP_INFO
+WHERE Salary = (SELECT MIN(Salary) FROM EMP_INFO);
+=============================================================
+Question-17. Select Employee who is working on project UCI WEB PORTAL and
+Technology is .NET.
+---------------------------------------------------------------------------
+SELECT E.*
+FROM EMP_INFO E
+JOIN Project P ON E.Employee_id = P.Employee_id
+WHERE P.Project_Name = 'UCI WEB PORTAL' AND P.Technology = '.NET';
+==========================================================================
+Question-18. Select Employee whose technology is JAVA.
+-------------------------------------------------------
+SELECT * FROM EMP_INFO
+WHERE Technology = 'JAVA';
+==============================================================
+Question-19. Select Emp_Name, Salary, Join_date, from EMP_INFO table, Department
+name from DEPARTMENT Table, Project Name from Project Table.
+----------------------------------------------------------------------------
+SELECT E.Emp_Name, E.Salary, E.Join_date, D.Department_name, P.Project_Name
+FROM EMP_INFO E
+JOIN DEPARTMENT D ON E.Department_id = D.Department_id
+JOIN Project P ON E.Project_id = P.Project_id;
+==========================================================================
+Question-20. Select Client_Name, Project_Name, Due_date from Project table in ascending
+order according to Due_date.
+---------------------------------
+SELECT Client_Name, Project_Name, Due_date
+FROM Project
+ORDER BY Due_date ASC;
+============================================
+Question-21. Display records of all employees whose join date is between 2021-06-12
+and2022-05-12.
+--------------------
+DECLARE
+   -- Define variables to store date ranges
+   start_date DATE := TO_DATE('2021-06-12', 'YYYY-MM-DD');
+   end_date DATE := TO_DATE('2022-05-12', 'YYYY-MM-DD');
+BEGIN
+   -- Use a SELECT statement to retrieve records within the date range
+   FOR emp_rec IN (SELECT * FROM EMP_INFO WHERE Join_date BETWEEN start_date AND end_date) LOOP
+      -- Display the employee records or perform any desired operations
+      DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_rec.Employee_id);
+      DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.Emp_Name);
+      DBMS_OUTPUT.PUT_LINE('Join Date: ' || TO_CHAR(emp_rec.Join_date, 'YYYY-MM-DD'));
+      -- Add more columns as needed
+   END LOOP;
+END;
+/
+==========================================================================================
+question-22. Display records of top 3 employees having maximum salary.
+----------------------------------------------------------------------------
+DECLARE
+BEGIN
+   FOR emp_rec IN (
+      SELECT *
+      FROM (
+         SELECT *
+         FROM EMP_INFO
+         ORDER BY Salary DESC
+      )
+      WHERE ROWNUM <= 3
+   ) LOOP
+      -- Display employee records or perform any desired operations
+      DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_rec.Employee_id);
+      DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.Emp_Name);
+      DBMS_OUTPUT.PUT_LINE('Salary: ' || emp_rec.Salary);
+      -- Add more columns as needed
+   END LOOP;
+END;
+/
+=========================================================================
+Question-23. Display count of all employees.
+-----------------------------------------------
+DECLARE
+   emp_count NUMBER;
+BEGIN
+   -- Use the COUNT() function to count all employees
+   SELECT COUNT(*) INTO emp_count FROM EMP_INFO;
+   
+   -- Display the employee count
+   DBMS_OUTPUT.PUT_LINE('Total Number of Employees: ' || emp_count);
+END;
+/
+==========================================================================
+Question-24. Display count of all projects.
+--------------------------------------------
+DECLARE
+   project_count NUMBER;
+BEGIN
+   -- Use the COUNT() function to count all projects
+   SELECT COUNT(*) INTO project_count FROM Project;
+   
+   -- Display the project count
+   DBMS_OUTPUT.PUT_LINE('Total Number of Projects: ' || project_count);
+END;
+/
+===========================================================================
+Question-25. Display Total Salary given to Employees.
+--------------------------------------------------------
+DECLARE
+   total_salary NUMBER;
+BEGIN
+   -- Use the SUM() function to calculate the total salary
+   SELECT SUM(Salary) INTO total_salary FROM EMP_INFO;
+   
+   -- Display the total salary
+   DBMS_OUTPUT.PUT_LINE('Total Salary Given to Employees: ' || total_salary);
+END;
+/
+==================================================================================
+Question-26. Update all employee salary to 30000 whose joining date is between 2021-
+06-12and 2022-05-12 and salary is less than 25000.
+-----------------------------------------------------
+DECLARE
+BEGIN
+   -- Update the salary for eligible employees
+   UPDATE EMP_INFO
+   SET Salary = 30000
+   WHERE Join_date BETWEEN TO_DATE('2021-06-12', 'YYYY-MM-DD') AND TO_DATE('2022-05-12', 'YYYY-MM-DD')
+   AND Salary < 25000;
+   
+   -- Display a message indicating the number of employees whose salaries were updated
+   DBMS_OUTPUT.PUT_LINE('Updated ' || SQL%ROWCOUNT || ' employees'' salaries.');
+   
+   -- Commit the transaction
+   COMMIT;
+END;
+/
+==================================================================================
+Question-27. Update all employee salary to 50000 whose joining date is between 2020-
+08-12and 2021-05-12 and salary is less than 40000.
+-------------------------------------------------------
+DECLARE
+BEGIN
+   -- Update the salary for eligible employees
+   UPDATE EMP_INFO
+   SET Salary = 50000
+   WHERE Join_date BETWEEN TO_DATE('2020-08-12', 'YYYY-MM-DD') AND TO_DATE('2021-05-12', 'YYYY-MM-DD')
+   AND Salary < 40000;
+   
+   -- Display a message indicating the number of employees whose salaries were updated
+   DBMS_OUTPUT.PUT_LINE('Updated ' || SQL%ROWCOUNT || ' employees'' salaries.');
+   
+   -- Commit the transaction
+   COMMIT;
+END;
+/
+=============================================================================
+Question-28. Update all employee salary to 45000 whose joining date is between 2021-
+06-12and 2022-05-12 and salary is less than 40000.
+------------------------------------------------------
+DECLARE
+BEGIN
+   -- Update the salary for eligible employees
+   UPDATE EMP_INFO
+   SET Salary = 45000
+   WHERE Join_date BETWEEN TO_DATE('2021-06-12', 'YYYY-MM-DD') AND TO_DATE('2022-05-12', 'YYYY-MM-DD')
+   AND Salary < 40000;
+   
+   -- Display a message indicating the number of employees whose salaries were updated
+   DBMS_OUTPUT.PUT_LINE('Updated ' || SQL%ROWCOUNT || ' employees'' salaries.');
+   
+   -- Commit the transaction
+   COMMIT;
+END;
+/
+============================================================
+question-29. Update Department to design of employee which technology is React and
+current Department is support.
+----------------------------------------
+DECLARE
+BEGIN
+   -- Update the department for eligible employees
+   UPDATE EMP_INFO
+   SET Department = 'Design'
+   WHERE Technology = 'React' AND Department = 'Support';
+   
+   -- Display a message indicating the number of employees whose departments were updated
+   DBMS_OUTPUT.PUT_LINE('Updated ' || SQL%ROWCOUNT || ' employees'' departments.');
+   
+   -- Commit the transaction
+   COMMIT;
+END;
+/
+========================================================================
+Question-30. Update Technology of employees whose Technology is Angular and working
+on project UCI WEB PORTAL.
+--------------------------------
+DECLARE
+BEGIN
+   -- Update the technology for eligible employees
+   UPDATE EMP_INFO
+   SET Technology = 'NewTechnology'  -- Replace 'NewTechnology' with the desired new technology
+   WHERE Technology = 'Angular' 
+   AND Employee_id IN (
+      SELECT Employee_id
+      FROM Project
+      WHERE Project_Name = 'UCI WEB PORTAL'
+   );
+
+   -- Display a message indicating the number of employees whose technology was updated
+   DBMS_OUTPUT.PUT_LINE('Updated ' || SQL%ROWCOUNT || ' employees'' technology.');
+   
+   -- Commit the transaction
+   COMMIT;
+END;
+/
+=============================================================================================
+Question-31.Delete Employee record where Emp_id is 101.
+--------------------------------------------------------
+DELETE FROM EMP_INFO
+WHERE Employee_id = 101;
+=============================================================
+Question-32. Change Table Name Emp_INFO to Employee_INFO.
+------------------------------------------------------------
+DECLARE
+   v_sql VARCHAR2(100);
+BEGIN
+   -- Create a dynamic SQL statement to rename the table
+   v_sql := 'ALTER TABLE Emp_INFO RENAME TO Employee_INFO';
+   
+   -- Execute the dynamic SQL statement
+   EXECUTE IMMEDIATE v_sql;
+   
+   -- Commit the transaction
+   COMMIT;
+   
+   DBMS_OUTPUT.PUT_LINE('Table renamed successfully.');
+EXCEPTION
+   WHEN OTHERS THEN
+      -- Handle exceptions
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+/
+==========================================================================
+Question-33. Add a gender column in Employee_INFO table.
+-------------------------------------------------------------
+DECLARE
+BEGIN
+   -- Use the ALTER TABLE statement to add the "Gender" column
+   EXECUTE IMMEDIATE 'ALTER TABLE Employee_INFO ADD (Gender VARCHAR2(10))';
+   
+   -- Commit the transaction
+   COMMIT;
+   
+   DBMS_OUTPUT.PUT_LINE('Column "Gender" added successfully.');
+EXCEPTION
+   WHEN OTHERS THEN
+      -- Handle exceptions
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+/
+======================================================================
+Question-34. Delete all records from Employee_INFO Table..
+-----------------------------------------------------------
+DECLARE
+BEGIN
+   -- Use the DELETE statement to remove all records from the table
+   DELETE FROM Employee_INFO;
+   
+   -- Commit the transaction
+   COMMIT;
+   
+   DBMS_OUTPUT.PUT_LINE('All records deleted from Employee_INFO table.');
+EXCEPTION
+   WHEN OTHERS THEN
+      -- Handle exceptions
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+/
+===============================================================================
+Question-35. Delete table Employee_INFO table .
+------------------------------------------------------
+DECLARE
+BEGIN
+   -- Use the DROP TABLE statement to delete the table
+   EXECUTE IMMEDIATE 'DROP TABLE Employee_INFO';
+   
+   -- Commit the transaction
+   COMMIT;
+   
+   DBMS_OUTPUT.PUT_LINE('Table Employee_INFO dropped successfully.');
+EXCEPTION
+   WHEN OTHERS THEN
+      -- Handle exceptions
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+/
+==================================================================================
+Question-36. Create a Procedure to display all records from EMP_INFO table.
+------------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE DisplayEmployeeRecords
+IS
+BEGIN
+   -- Use a cursor to retrieve all records from the EMP_INFO table
+   FOR emp_rec IN (SELECT * FROM EMP_INFO)
+   LOOP
+      -- Display employee information or perform any desired operations
+      DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_rec.Employee_id);
+      DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.Emp_Name);
+      DBMS_OUTPUT.PUT_LINE('Salary: ' || emp_rec.Salary);
+      -- Add more columns as needed
+   END LOOP;
+END DisplayEmployeeRecords;
+/
+You can execute this procedure by calling it as follows:
+BEGIN
+   DisplayEmployeeRecords;
+END;
+/
+========================================================================================
+Question-37. Create a Procedure to display specific records from EMP_INFO table.
+---------------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE DisplayEmployeeRecordsByDepartment(
+   department_name IN VARCHAR2
+)
+IS
+BEGIN
+   -- Use a cursor to retrieve records from the EMP_INFO table based on the department
+   FOR emp_rec IN (SELECT * FROM EMP_INFO WHERE Department = department_name)
+   LOOP
+      -- Display employee information or perform any desired operations
+      DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_rec.Employee_id);
+      DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.Emp_Name);
+      DBMS_OUTPUT.PUT_LINE('Salary: ' || emp_rec.Salary);
+      -- Add more columns as needed
+   END LOOP;
+END DisplayEmployeeRecordsByDepartment;
+/
+You can execute this procedure by calling it with the desired department name as follows:
+BEGIN
+   DisplayEmployeeRecordsByDepartment('YourDepartmentName');
+END;
+/
+=========================================================================
+Question-38. Create a Procedure to display 5 records from EMP_INFO table.
+----------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE DisplayFirstFiveEmployeeRecords
+IS
+BEGIN
+   -- Use a cursor to retrieve the first 5 records from the EMP_INFO table
+   FOR emp_rec IN (
+      SELECT *
+      FROM EMP_INFO
+      WHERE ROWNUM <= 5
+   )
+   LOOP
+      -- Display employee information or perform any desired operations
+      DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_rec.Employee_id);
+      DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.Emp_Name);
+      DBMS_OUTPUT.PUT_LINE('Salary: ' || emp_rec.Salary);
+      -- Add more columns as needed
+   END LOOP;
+END DisplayFirstFiveEmployeeRecords;
+/
+You can execute this procedure as follows:
+BEGIN
+   DisplayFirstFiveEmployeeRecords;
+END;
+/
+==============================================
+Question-39. Create a Procedure to insert record in EMP_INFO table.
+------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE InsertEmployeeRecord(
+   emp_id IN NUMBER,
+   emp_name IN VARCHAR2,
+   salary IN NUMBER,
+   join_date IN DATE,
+   department IN VARCHAR2,
+   technology IN VARCHAR2
+)
+IS
+BEGIN
+   -- Use an INSERT statement to insert the record into the EMP_INFO table
+   INSERT INTO EMP_INFO (Employee_id, Emp_Name, Salary, Join_date, Department, Technology)
+   VALUES (emp_id, emp_name, salary, join_date, department, technology);
+   
+   -- Commit the transaction
+   COMMIT;
+   
+   DBMS_OUTPUT.PUT_LINE('Record inserted successfully.');
+EXCEPTION
+   WHEN OTHERS THEN
+      -- Handle exceptions
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END InsertEmployeeRecord;
+/
+You can execute this procedure by calling it and passing the values for the new employee record:
+BEGIN
+   InsertEmployeeRecord(101, 'John Doe', 50000, TO_DATE('2023-01-15', 'YYYY-MM-DD'), 'HR', 'Java');
+END;
+/
+========================================================================================================
+Question-40. Create a procedure to update a specific record from EMP_INFO Table.
+----------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE UpdateEmployeeRecord(
+   emp_id_to_update IN NUMBER,
+   new_emp_name IN VARCHAR2,
+   new_salary IN NUMBER,
+   new_join_date IN DATE,
+   new_department IN VARCHAR2,
+   new_technology IN VARCHAR2
+)
+IS
+BEGIN
+   -- Use an UPDATE statement to update the specific record in the EMP_INFO table
+   UPDATE EMP_INFO
+   SET Emp_Name = new_emp_name,
+       Salary = new_salary,
+       Join_date = new_join_date,
+       Department = new_department,
+       Technology = new_technology
+   WHERE Employee_id = emp_id_to_update;
+   
+   -- Commit the transaction
+   COMMIT;
+   
+   DBMS_OUTPUT.PUT_LINE('Record updated successfully.');
+EXCEPTION
+   WHEN OTHERS THEN
+      -- Handle exceptions
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END UpdateEmployeeRecord;
+/
+You can execute this procedure by calling it and passing the employee ID and the new values for the columns you want to update:
+BEGIN
+   UpdateEmployeeRecord(101, 'Updated Name', 55000, TO_DATE('2023-02-15', 'YYYY-MM-DD'), 'Updated Department', 'Updated Technology');
+END;
+/
+=======================================================================================================================================
+Question-41. Create a Procedure to delete specific record from EMP_INFO Table.
+------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE DeleteEmployeeRecord(
+   emp_id_to_delete IN NUMBER
+)
+IS
+BEGIN
+   -- Use a DELETE statement to delete the specific record from the EMP_INFO table
+   DELETE FROM EMP_INFO WHERE Employee_id = emp_id_to_delete;
+   
+   -- Commit the transaction
+   COMMIT;
+   
+   DBMS_OUTPUT.PUT_LINE('Record deleted successfully.');
+EXCEPTION
+   WHEN OTHERS THEN
+      -- Handle exceptions
+      DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END DeleteEmployeeRecord;
+/
+You can execute this procedure by calling it and passing the employee ID of the record you want to delete:
+BEGIN
+   DeleteEmployeeRecord(101);
+END;
+/
+=====================================================================================================
+Question-42. Create a Procedure to display all projects.
+---------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE DisplayAllProjects
+IS
+BEGIN
+   -- Use a cursor to retrieve all records from the Project table
+   FOR project_rec IN (SELECT * FROM Project)
+   LOOP
+      -- Display project information or perform any desired operations
+      DBMS_OUTPUT.PUT_LINE('Project ID: ' || project_rec.Project_id);
+      DBMS_OUTPUT.PUT_LINE('Project Name: ' || project_rec.Project_Name);
+      DBMS_OUTPUT.PUT_LINE('Client Name: ' || project_rec.Client_Name);
+      DBMS_OUTPUT.PUT_LINE('Technology: ' || project_rec.Technology);
+      DBMS_OUTPUT.PUT_LINE('Due Date: ' || TO_CHAR(project_rec.Due_date, 'YYYY-MM-DD'));
+      -- Add more columns as needed
+   END LOOP;
+END DisplayAllProjects;
+/
+You can execute this procedure as follows:
+BEGIN
+   DisplayAllProjects;
+END;
+/
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+**************Solved By Vikrant Singh ,(GPM),Chitrakoot.2023/10/01****************************************************
